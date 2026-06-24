@@ -20,8 +20,9 @@ def check_connection(silent=False):
             if not self.Core.connector.disconnect.is_set():
                 try:
                     return func(self, *args, **kwargs)
-                except:
+                except Exception as err:
                     self.Core.connector.disconnect.set()
+                    print(f'{func.__name__}: {err}')
                     time.sleep(3)
             else:
                 if not silent:
@@ -32,6 +33,7 @@ def check_connection(silent=False):
 
 
 def debug_log(func):
+    """Логирует вызов функции на уровне дебаг"""
     def wrapper(self, *args, **kwargs):
         self.logger.debug(f'Call: {func.__name__}({",".join([arg for arg in args])})')
         return func(self, *args, **kwargs)

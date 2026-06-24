@@ -16,7 +16,7 @@ class AuthManager(JsonProtocol, ResponsProtocol):
         self.Managers = Managers
 
         self.path = 'data/users.json'
-        self.auth_dict = {}
+        self.auth_dict = {} # {user:{}, user2:{}, ...} все зарегистрированные пользователи
         self.auth_dict.update(self.load_from_file(self.path))
 
         self.logger.debug('Инициализирован')
@@ -88,15 +88,21 @@ class AuthManager(JsonProtocol, ResponsProtocol):
         else:
             self._error(client_addr, 'Неверный логин или пароль.')
 
+    def update_nick(self, addr, nickname):
+        username = self._get_username_by_addr(addr)
+        if username in self.auth_dict:
+            self.auth_dict[username].update({
+                'nickname': nickname
+            })
+            self.save_to_file(self.path, self.auth_dict)
+
     def _get_username_by_addr(self, addr):
         for us, data in self.auth_dict.items():
             if addr == data.get('addr'):
                 return us
 
-    def update_nick(self, addr, nickname):
-        username = self._get_username_by_addr(addr)
-        if username in self.auth_dict:
-            self.auth_dict[username].update({
-                'nicname': nickname
-            })
-            self.save_to_file(self.path, self.auth_dict)
+    def _get_username_by_nickname(self, nickname):
+        for username, data in self.auth_dict.items():
+            if data.get('nickname') == nickname:
+                return username
+        return None

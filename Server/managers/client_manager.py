@@ -19,7 +19,7 @@ class ClientManager:
         self.socket.listen(10)
         self.running = threading.Event(); self.running.set()
 
-        self.clients = {} # {addr: {'registered': False, ...}, ...}
+        self.clients = {} # {addr: {'registered': False, ...}, ...} все клиенты онлайн
 
         self.handl_connections_thr = threading.Thread(target=self.handl_connections)
         self.handl_connections_thr.start()
@@ -61,3 +61,21 @@ class ClientManager:
                 self.logger.info('Сокет закрыт')
             except:
                 pass
+
+    def remove_client(self, client_addr):
+        """Безопасно удаляет клиента"""
+        if client_addr in self.clients:
+            try:
+                self.clients[client_addr]['socket'].close()
+            except:
+                pass
+            del self.clients[client_addr]
+            self.logger.info(f'Удалили клиента: {client_addr} ')
+            return True
+        return False
+
+    def _get_addr_by_nickname(self, nickname):
+        """Возвращает адрес клиента по никнейму"""
+        for addr, client in self.clients.items():
+            if client.get('nickname') == nickname:
+                return addr

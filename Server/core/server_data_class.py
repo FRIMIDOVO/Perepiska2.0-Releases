@@ -11,8 +11,10 @@ class Handlers:
 class Managers:
     client_manager: object = None
     auth_manager: object = None
+    sms_manager: object = None
 
 @dataclass
 class Protocols:
     admin_commands: object = None
     client_messages: object = None
+    file_messages: object = None

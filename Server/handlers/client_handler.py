@@ -16,6 +16,9 @@ class ClientHandler(JsonProtocol):
 
         self.typs = {
             'private_message': self.Protocols.client_messages.private_message,
+            'get_offline_sms': self.Protocols.client_messages.return_offline_sms,
+            'send_file': self.Protocols.file_messages.file_upload,
+            'load_file': self.Protocols.file_messages.send_file,
             'set_nickname': self.Protocols.client_messages.set_nickname,
             'get_users_list': self.Protocols.client_messages.return_users_list,
             'get_salt': self.Managers.auth_manager.return_salt,
@@ -41,6 +44,6 @@ class ClientHandler(JsonProtocol):
                     self.logger.debug(f'{client_addr}: {data}')
                 else:
                     self.logger.error(f'Тип {data_type} сообщения от пользователя {client_addr} не поддерживается')
-            except Exception as err:
-                self.logger.error(f'Неизвестная ошибка: {err}')
+            except:
+                self.Managers.client_manager.remove_client(client_addr)
                 break

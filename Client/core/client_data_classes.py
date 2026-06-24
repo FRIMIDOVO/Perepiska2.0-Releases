@@ -14,5 +14,6 @@ class Handlers:
 @dataclass
 class Protocols:
     auth_commands: object = None
+    file_commands: object = None
     commands: object = None
     messages: object = None

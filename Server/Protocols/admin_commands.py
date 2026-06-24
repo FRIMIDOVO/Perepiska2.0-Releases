@@ -13,11 +13,12 @@ class AdminCommands:
         self.Managers = Managers
 
     def close_server(self, text):
-        self.logger.info('Закрытие сервера...')
-        print('Закрытие сервера...')
-        self.Managers.client_manager._close_socket()
-        self.Managers.client_manager.running.clear()
-        sys.exit(0)
+        if self.Managers.client_manager.running.is_set():
+            self.logger.info('Закрытие сервера...')
+            print('Закрытие сервера...')
+            self.Managers.client_manager._close_socket()
+            self.Managers.client_manager.running.clear()
+            sys.exit(0)
 
     def users_dict(self, text):
         if not self.Managers.client_manager.clients.items():
@@ -31,6 +32,6 @@ class AdminCommands:
 
     def help(self, text):
         print("""Доступные команды:
-    /users_dict                 - посмотреть словарь с пользователями
+    /users                      - посмотреть словарь с пользователями
     /close_server               - безопасное закрытие сервера
     /help                       - эта справка""")

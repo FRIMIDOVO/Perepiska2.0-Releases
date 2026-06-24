@@ -17,9 +17,13 @@ class SenderHandler:
             '/msg': self.Protocols.commands.private_message,
             '/set_nick': self.Protocols.commands.set_nickname,
             '/help': self.Protocols.commands.help,
+            '/offline_sms': self.Protocols.commands.get_offline_sms,
             '/get_users': self.Protocols.commands.get_users_list,
+            '/all_files': self.Protocols.commands.all_files,
             '/reg': self.Protocols.auth_commands.register,
             '/auth': self.Protocols.auth_commands.auth,
+            '/send_file': self.Protocols.file_commands.send_file,
+            '/load_file': self.Protocols.commands.load_file,
             '/exit': self.Protocols.commands.exit
         }
         self.send_thr = threading.Thread(target=self.send_loop, daemon=True)
@@ -29,13 +33,16 @@ class SenderHandler:
     def send_loop(self):
         """Цикл чтения команд и их обработки"""
         while True:
-            text = input()
-            if not text:
-                continue
-            parts = text.split(maxsplit=1)
-            command = parts[0]
-            if command not in self.commands:
-                print(f'Команды "{command}" не существует. /help для помощи')
-                continue
-            arg = parts[1] if len(parts) > 1 else ""
-            self.commands[command](arg)
+            try:
+                text = input()
+                if not text:
+                    continue
+                parts = text.split(maxsplit=1)
+                command = parts[0]
+                if command not in self.commands:
+                    print(f'Команды "{command}" не существует. /help для справки')
+                    continue
+                arg = parts[1] if len(parts) > 1 else ""
+                self.commands[command](arg)
+            except:
+                self.Protocols.commands.exit(None)

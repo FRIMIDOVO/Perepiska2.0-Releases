@@ -8,9 +8,11 @@ from Server.handlers.admin_bash import AdminBash
 
 from Server.managers.client_manager import ClientManager
 from Server.managers.auth_manager import AuthManager
+from Server.managers.sms_manager import SmsManager
 
 from Server.Protocols.client_messages import ClientMessages
 from Server.Protocols.admin_commands import AdminCommands
+from Server.Protocols.file_messages import FileMessages
 
 
 setup_logger()
@@ -31,8 +33,14 @@ class Server:
         self.admin_bash = AdminBash(self.Protocols)
         self.Handlers.admin_bash = self.admin_bash
 
+        self.file_messages = FileMessages(self.Managers, self.Protocols)
+        self.Protocols.file_messages = self.file_messages
+
         self.auth_manager = AuthManager(self.Managers)
         self.Managers.auth_manager = self.auth_manager
+
+        self.sms_manager = SmsManager()
+        self.Managers.sms_manager = self.sms_manager
 
         self.client_messages = ClientMessages(self.Managers)
         self.Protocols.client_messages = self.client_messages

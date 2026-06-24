@@ -18,6 +18,8 @@ class ReceiverHandler(JsonProtocol):
         self.typs = {
             'error': self.Protocols.messages.error,
             'private_message': self.Protocols.messages.private_message,
+            'start_file_upload': self.Protocols.file_commands.file_upload,
+            'file': self.Protocols.messages.file,
             'info': self.Protocols.messages.info,
             'return_users_list': self.Protocols.messages.return_users_list,
             'return_salt': self.Protocols.messages.return_salt
@@ -34,15 +36,17 @@ class ReceiverHandler(JsonProtocol):
 
     @check_connection(silent=True)
     def receive(self):
+        """Приём одного ответа"""
         raw_data = self.Core.connector.socket.recv(4096)
         if not raw_data:
-            pass
+            return
         data = self.decode(raw_data)
         data_type = data.get('type')
         self.typs[data_type](data)
 
     @debug_log
     def wait_for(self, data_type, timeout=5):
+        """Ждёт и возвращает дату нужного типа"""
         start_time = time.time()
         while time.time() - start_time < timeout:
             answer = self.Protocols.messages._get_answer(data_type)

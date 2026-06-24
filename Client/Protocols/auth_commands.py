@@ -18,6 +18,7 @@ class AuthCommands(JsonProtocol):
     @check_connection()
     @debug_log # /reg <username> <password> <password>
     def register(self, text):
+        """Запрос на регистрацию"""
         parts = text.split()
         if len(parts) != 3:
             print('Правильное использование: /reg <юзернейм> <пароль> <пароль>')
@@ -41,6 +42,7 @@ class AuthCommands(JsonProtocol):
     @check_connection()
     @debug_log # /auth <username> <password>
     def auth(self, text):
+        """Запрос на вход в акк"""
         parts = text.split()
         if len(parts) != 2:
             print('Правильное использование: /auth <юзернейм> <пароль>')
@@ -61,6 +63,7 @@ class AuthCommands(JsonProtocol):
     @check_connection()
     @debug_log
     def _get_salt(self, username):
+        """Запрос соли для регистрации/входа"""
         request = self.encode({
             'type': 'get_salt',
             'username': username
