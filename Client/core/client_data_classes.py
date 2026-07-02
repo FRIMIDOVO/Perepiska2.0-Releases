@@ -17,3 +17,4 @@ class Protocols:
     file_commands: object = None
     commands: object = None
     messages: object = None
+    msg_history_db: object = None

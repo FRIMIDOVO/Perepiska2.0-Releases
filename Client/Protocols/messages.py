@@ -1,42 +1,55 @@
 import logging
+import time
 
 from Client.core.config import setup_logger
+
+from PyQt5.QtCore import QObject, pyqtSignal
 
 
 setup_logger()
 
 
-class Messages:
+class Messages(QObject):
+    error_msg = pyqtSignal(str)
+    info_msg = pyqtSignal(str)
+
     def __init__(self, Protocols):
+        super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
         self.Protocols = Protocols
 
         self.responses = []
         self.logger.debug('Инициализирован')
 
-    def _get_answer(self, data_type):
-        for i, resp in enumerate(self.responses):
-            if resp.get('type') == data_type:
-                return self.responses.pop(i)
+    def _get_answer(self, data_type, timeout=3):
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            for i, resp in enumerate(self.responses):
+                if resp.get('type') == data_type:
+                    return self.responses.pop(i)
         return None
 
     def error(self, data):
-        print(f'Ошибка: {data.get("text")}')
+        self.error_msg.emit(data.get('text'))
 
     def private_message(self, data):
-        print(f'{data.get("time")}|{data.get("from")}: {data.get("text")}')
+        text = data.get('text')
+        fr = data.get('from')
+        time = data.get('time')
+        print(f'{data.get("time")}|{fr}: {text}')
+        # + сохранение в локальную базу данных с сообщениями
+        msg_to_save = {
+            'sender': fr,
+            'text': text,
+            'time': time
+        }
+        self.Protocols.msg_history_db.insert("messages", msg_to_save)
 
     def info(self, data):
-        print(f'Инфо: {data.get("text")}')
+        self.info_msg.emit(data.get('text'))
 
     def return_users_list(self, data):
-        users = data.get('list')
-        print('Список пользователей:')
-        for user in users:
-            nickname = user.get('nickname')
-            online = user.get('online', False)
-            status = '🟢' if online else '🔴'
-            print(f'{status} {nickname}')
+        self.responses.append(data)
 
     def file(self, data):
         print(f'{data.get("time")}|{data.get("from")}: {data.get("file_name")}; {data.get("text") or ""}')

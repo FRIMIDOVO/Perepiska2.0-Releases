@@ -13,13 +13,13 @@ class SmsManager(JsonProtocol):
         self.logger = logging.getLogger(self.__class__.__name__)
 
         self.sms_path = 'data/sms.json'
-        self.sms = defaultdict(list) # {user: [{}, {}, ...], user2: [...], ...}
-        self.sms.update(self.load_from_file(self.sms_path))
+        data = self.load_from_file(self.sms_path)
+        self.sms = defaultdict(list, data) # {user: [{}, {}, ...], user2: [...], ...}
 
         self.logger.debug('Инициализирован')
 
     def add_message(self, username, data):
-        """Добавляет сообщение юзеру в оффлайн очередь"""
+        """Добавляет сообщение юзеру в офлайн очередь"""
         self.sms[username].append(data)
         self.save_to_file(self.sms_path, self.sms)
 

@@ -42,7 +42,7 @@ class Commands(JsonProtocol):
     """
         print(help_text)
 
-    @check_connection()
+    @check_connection
     @debug_log
     def private_message(self, text):
         """Отправляет личные сообщения"""
@@ -58,7 +58,7 @@ class Commands(JsonProtocol):
         })
         self.Core.connector.socket.send(raw_data)
 
-    @check_connection()
+    @check_connection
     @debug_log
     def set_nickname(self, nick):
         """Устанавливает никнейм на сервере"""
@@ -71,21 +71,21 @@ class Commands(JsonProtocol):
         })
         self.Core.connector.socket.send(raw_data)
 
-    @check_connection()
+    @check_connection
     @debug_log
-    def get_users_list(self, text):
+    def get_users_list(self):
         """Запрос на список пользователей"""
         raw_data = self.encode({'type': 'get_users_list'})
         self.Core.connector.socket.send(raw_data)
 
-    @check_connection()
+    @check_connection
     @debug_log
     def get_offline_sms(self, text):
         """Запрос на все сообщзения в отстутствие пользователя"""
         raw_data = self.encode({'type': 'get_offline_sms'})
         self.Core.connector.socket.send(raw_data)
 
-    @check_connection()
+    @check_connection
     @debug_log
     def load_file(self, name):
         """Запрос на загрузку файла по имени"""

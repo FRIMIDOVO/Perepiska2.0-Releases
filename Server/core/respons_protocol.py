@@ -1,6 +1,9 @@
 
 
 class ResponsProtocol:
+    def __init__(self):
+        pass
+
     def _error(self, client_addr, text):
         """Отправка пользователю ошибки"""
         raw = self.encode({

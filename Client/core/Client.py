@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from Client.core.client_data_classes import Core, Handlers, Protocols
 from Client.core.config import setup_logger
@@ -11,6 +12,10 @@ from Client.Protocols.auth_commands import AuthCommands
 from Client.Protocols.file_commands import FileCommands
 from Client.Protocols.commands import Commands
 from Client.Protocols.messages import Messages
+from Client.Protocols.db_commands import Database
+
+from Client.GUI.main_gui_manager import GuiManager
+from PyQt5.QtWidgets import QApplication
 
 
 setup_logger()
@@ -24,6 +29,10 @@ class Client:
         self.Core = Core(); self.Core.addr = self.addr
         self.Handlers = Handlers()
         self.Protocols = Protocols()
+
+        self.msg_history_db = Database('data/data_bases/msg_history.db')
+        self.Protocols.msg_history_db = self.msg_history_db
+        self.create_table_in_db()
 
         self.messages = Messages(self.Protocols)
         self.Protocols.messages = self.messages
@@ -45,5 +54,21 @@ class Client:
 
         self.receiver_handler = ReceiverHandler(self.Core, self.Protocols)
         self.Handlers.receiver_handler = self.receiver_handler
-
         self.logger.debug('Все классы инициализированы')
+
+        self.start_gui()
+
+    def start_gui(self):
+        app = QApplication(sys.argv)
+        self.GUI = GuiManager(self.Core, self.Protocols)
+        self.GUI.show()
+        sys.exit(app.exec_())
+
+    def create_table_in_db(self):
+        msg_schema = {
+            'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
+            'sender': 'TEXT NOT NULL',
+            'text': 'TEXT NOT NULL',
+            'time': 'TEXT NOT NULL',
+        }
+        self.msg_history_db.create_table('messages', msg_schema)

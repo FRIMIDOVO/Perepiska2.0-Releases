@@ -5,12 +5,17 @@ import time
 
 from Client.core.config import setup_logger
 
+from PyQt5.QtCore import QObject, pyqtSignal
+
 
 setup_logger()
 
 
-class Connector:
+class Connector(QObject):
+    connection_lost = pyqtSignal(str) # сигнал об отсутствии подключения к серверу
+
     def __init__(self, Core):
+        super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
         self.addr = Core.addr
         self.socket = None

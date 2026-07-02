@@ -21,7 +21,7 @@ class FileCommands(JsonProtocol):
 
         self.logger.debug('Инициализирован')
 
-    @check_connection()
+    @check_connection
     @debug_log # /send_file <никнейм получателя> <имя файла> (должен быть в папке data/files) <текстовое сообщение>
     def send_file(self, text):
         """Фулл функция отправки файла на сервер с предупреждением"""
@@ -65,7 +65,7 @@ class FileCommands(JsonProtocol):
             print(f'Ошибка отправки: {e}')
             return False
 
-    @check_connection()
+    @check_connection
     def file_upload(self, data):
         """Функция загрузки файла с сервера"""
         filename = data.get('filename')

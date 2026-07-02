@@ -32,9 +32,12 @@ class ReceiverHandler(JsonProtocol):
     def receive_loop(self):
         """Цикл чтения сообщений от сервера"""
         while True:
+            # Если подключения нет, просто спим и ждём, пока Connector не поднимет его
+            if self.Core.connector.disconnect.is_set():
+                time.sleep(1)
+                continue
             self.receive()
 
-    @check_connection(silent=True)
     def receive(self):
         """Приём одного ответа"""
         raw_data = self.Core.connector.socket.recv(4096)

@@ -1,5 +1,6 @@
 import logging
-import time
+
+from Client.GUI.toast import Toast
 
 
 def setup_logger(logs_in_file=False, level=logging.DEBUG, log_file='data/logs.log'):
@@ -13,23 +14,19 @@ def setup_logger(logs_in_file=False, level=logging.DEBUG, log_file='data/logs.lo
     )
 
 
-def check_connection(silent=False):
+def check_connection(func):
     """Декоратор, проверяющий подключение к серверу"""
-    def decorator(func):
-        def wrapper(self, *args, **kwargs):
-            if not self.Core.connector.disconnect.is_set():
-                try:
-                    return func(self, *args, **kwargs)
-                except Exception as err:
-                    self.Core.connector.disconnect.set()
-                    print(f'{func.__name__}: {err}')
-                    time.sleep(3)
-            else:
-                if not silent:
-                    print('Нет подключения к серверу')
-                time.sleep(3)
-        return wrapper
-    return decorator
+    def wrapper(self, *args, **kwargs):
+        if self.Core.connector.disconnect.is_set():
+            self.Core.connector.connection_lost.emit('Нет подключения к серверу')
+            return None
+        try:
+            return func(self, *args, **kwargs)
+        except Exception as err:
+            self.Core.connector.disconnect.set()
+            self.Core.connector.connection_lost.emit(f'{func.__name__}: {err}')
+            return None
+    return wrapper
 
 
 def debug_log(func):
